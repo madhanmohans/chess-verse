@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 
-// Map chess files (columns) to notes
+// Map chess files (columns) to notes - direct mapping now
 const fileToNote: Record<string, string> = {
   'a': 'C',
   'b': 'D',
@@ -9,19 +9,19 @@ const fileToNote: Record<string, string> = {
   'e': 'G',
   'f': 'A',
   'g': 'B',
-  'h': 'C', // G in chess = next C (higher octave)
+  'h': 'C', // H is C of the next octave
 };
 
 // Map chess ranks (rows) to octaves
 const rankToOctave: Record<string, number> = {
-  '1': 2,
-  '2': 3,
-  '3': 4,
-  '4': 5,
-  '5': 6,
-  '6': 7,
-  '7': 8,
-  '8': 9,
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
 };
 
 // Map pieces to instruments
@@ -47,8 +47,7 @@ const pieceToInstrument: Record<string, any> = {
     oscillator: { type: 'sine' },
     envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 1.4 }
   }).toDestination(),
-  'q': new Tone.PolySynth({ // Queen - Commander (complex, rich sound)
-  }).toDestination(),
+  'q': new Tone.PolySynth().toDestination(), // Queen - Commander (complex, rich sound)
   'k': new Tone.MetalSynth({ // King - Monarch (regal, bell-like sound)
     envelope: { attack: 0.001, decay: 1.4, release: 0.2 },
     harmonicity: 5.1,
@@ -62,7 +61,10 @@ const pieceToInstrument: Record<string, any> = {
 const specialSounds = {
   opening: () => {
     const synth = new Tone.PolySynth().toDestination();
-    synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "4n");
+    synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "4n", undefined, 0.9);
+    setTimeout(() => {
+      synth.triggerAttackRelease(["D4", "F4", "A4", "D5"], "4n", undefined, 1);
+    }, 500);
   },
   checkmate: () => {
     const synth = new Tone.PolySynth().toDestination();
@@ -70,33 +72,43 @@ const specialSounds = {
     setTimeout(() => {
       synth.triggerAttackRelease(["D4", "F4", "A4", "D5", "F5"], "4n", undefined, 0.9);
     }, 300);
+    setTimeout(() => {
+      synth.triggerAttackRelease(["G4", "B4", "D5", "G5"], "2n", undefined, 1);
+    }, 800);
   },
   check: () => {
     const synth = new Tone.PolySynth().toDestination();
     synth.triggerAttackRelease(["C5", "G4"], "8n", undefined, 0.7);
+    setTimeout(() => {
+      synth.triggerAttackRelease(["C5", "G4"], "16n", undefined, 0.9);
+    }, 200);
   },
   castling: () => {
     const synth = new Tone.PolySynth().toDestination();
     const now = Tone.now();
-    synth.triggerAttackRelease("C4", "8n", now);
-    synth.triggerAttackRelease("G4", "8n", now + 0.1);
-    synth.triggerAttackRelease("C5", "4n", now + 0.2);
+    synth.triggerAttackRelease("C4", "8n", now, 0.7);
+    synth.triggerAttackRelease("G4", "8n", now + 0.1, 0.8);
+    synth.triggerAttackRelease("C5", "4n", now + 0.2, 0.9);
+    synth.triggerAttackRelease("E5", "2n", now + 0.4, 1);
   },
   enPassant: () => {
     const synth = new Tone.FMSynth().toDestination();
-    synth.triggerAttackRelease("G6", "16n");
+    synth.triggerAttackRelease("G6", "16n", undefined, 0.7);
     setTimeout(() => {
-      synth.triggerAttackRelease("A6", "16n");
+      synth.triggerAttackRelease("A6", "16n", undefined, 0.8);
     }, 100);
+    setTimeout(() => {
+      synth.triggerAttackRelease("B6", "8n", undefined, 0.9);
+    }, 200);
   },
   stalemate: () => {
     const synth = new Tone.AMSynth().toDestination();
-    synth.triggerAttackRelease("C4", "8n");
+    synth.triggerAttackRelease("C4", "8n", undefined, 0.6);
     setTimeout(() => {
-      synth.triggerAttackRelease("C4", "8n");
+      synth.triggerAttackRelease("C4", "8n", undefined, 0.4);
     }, 300);
     setTimeout(() => {
-      synth.triggerAttackRelease("C4", "2n", undefined, 0.5);
+      synth.triggerAttackRelease("C4", "2n", undefined, 0.2);
     }, 600);
   },
 };
@@ -113,9 +125,20 @@ export const playSquareNote = (square: string) => {
   
   if (!note || !octave) return;
   
-  const noteWithOctave = `${note}${octave}`;
-  const synth = new Tone.Synth().toDestination();
-  synth.triggerAttackRelease(noteWithOctave, "8n");
+  // Handle h and g files which need octave adjustment
+  let adjustedOctave = octave;
+  if (file === 'h') {
+    adjustedOctave += 1; // H is C of the next octave
+  } else if (file === 'g' && note === 'B') {
+    // No adjustment needed anymore, as we're directly mapping
+  }
+  
+  const noteWithOctave = `${note}${adjustedOctave}`;
+  const synth = new Tone.Synth({
+    oscillator: { type: 'sine' },
+    envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.5 }
+  }).toDestination();
+  synth.triggerAttackRelease(noteWithOctave, "8n", undefined, 0.7);
 };
 
 // Function to play the sound for a piece
@@ -131,11 +154,19 @@ export const playPieceSound = (piece: string, square: string) => {
   
   if (!note || !octave || !pieceType) return;
   
-  const noteWithOctave = `${note}${octave}`;
+  // Handle h and g files which need octave adjustment
+  let adjustedOctave = octave;
+  if (file === 'h') {
+    adjustedOctave += 1; // H is C of the next octave
+  } else if (file === 'g' && note === 'B') {
+    // No adjustment needed anymore
+  }
+  
+  const noteWithOctave = `${note}${adjustedOctave}`;
   
   const instrument = pieceToInstrument[pieceType];
   if (instrument) {
-    instrument.triggerAttackRelease(noteWithOctave, "8n");
+    instrument.triggerAttackRelease(noteWithOctave, "8n", undefined, 0.8);
   }
 };
 
@@ -157,18 +188,26 @@ export const playCapture = (capturingPiece: string, capturedPiece: string, squar
   
   if (!note || !octave) return;
   
-  const noteWithOctave = `${note}${octave}`;
+  // Handle h and g files which need octave adjustment
+  let adjustedOctave = octave;
+  if (file === 'h') {
+    adjustedOctave += 1; // H is C of the next octave
+  } else if (file === 'g' && note === 'B') {
+    // No adjustment needed anymore
+  }
+  
+  const noteWithOctave = `${note}${adjustedOctave}`;
   
   const capturingInstrument = pieceToInstrument[capturingType];
   const capturedInstrument = pieceToInstrument[capturedType];
   
   if (capturedInstrument) {
-    capturedInstrument.triggerAttackRelease(noteWithOctave, "16n");
+    capturedInstrument.triggerAttackRelease(noteWithOctave, "16n", undefined, 0.9);
   }
   
   setTimeout(() => {
     if (capturingInstrument) {
-      capturingInstrument.triggerAttackRelease(noteWithOctave, "8n");
+      capturingInstrument.triggerAttackRelease(noteWithOctave, "8n", undefined, 1);
     }
   }, 150);
 };

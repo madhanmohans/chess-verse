@@ -75,29 +75,35 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         const newGame = new Chess(game.fen());
         const piece = newGame.get(move.from as Square);
         
+        // First play the source square note
+        playSquareNote(move.from as Square);
+        
         // Make the move
         const result = makeMove(newGame, move.from as Square, move.to as Square);
         
         if (result.success) {
-          // Play appropriate sounds
-          if (result.isCapture && result.capturedPiece) {
-            playCapture(`${piece?.color}${piece?.type}`, result.capturedPiece, move.to as Square);
-          } else {
-            playPieceSound(`${piece?.color}${piece?.type}`, move.to as Square);
-          }
-          
-          // Play special sounds if applicable
-          if (result.isCheckmate) {
-            playSpecialSound('checkmate');
-          } else if (result.isCheck) {
-            playSpecialSound('check');
-          } else if (result.isStalemate) {
-            playSpecialSound('stalemate');
-          } else if (result.isCastling) {
-            playSpecialSound('castling');
-          } else if (result.isEnPassant) {
-            playSpecialSound('enPassant');
-          }
+          // Play the destination sound after a small delay
+          setTimeout(() => {
+            // Play appropriate sounds
+            if (result.isCapture && result.capturedPiece) {
+              playCapture(`${piece?.color}${piece?.type}`, result.capturedPiece, move.to as Square);
+            } else {
+              playPieceSound(`${piece?.color}${piece?.type}`, move.to as Square);
+            }
+            
+            // Play special sounds if applicable
+            if (result.isCheckmate) {
+              playSpecialSound('checkmate');
+            } else if (result.isCheck) {
+              playSpecialSound('check');
+            } else if (result.isStalemate) {
+              playSpecialSound('stalemate');
+            } else if (result.isCastling) {
+              playSpecialSound('castling');
+            } else if (result.isEnPassant) {
+              playSpecialSound('enPassant');
+            }
+          }, 300);
           
           // Update game state
           setGame(newGame);
@@ -116,7 +122,70 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     }
   }, [audioInitialized, game, fen, playerColor, makeComputerMove]);
 
-  // Handle player move
+  // Handle piece dragging for drag and drop movement
+  const onPieceDragBegin = (piece: string, sourceSquare: Square) => {
+    // Initialize audio if not yet initialized (browsers require user interaction)
+    if (!audioInitialized) {
+      initAudio().then(() => setAudioInitialized(true));
+      return;
+    }
+
+    // Return if it's not the player's turn or the game is over
+    if (game.turn() !== playerColor || game.isGameOver() || isThinking) return;
+    
+    // Play the note for the source square
+    playSquareNote(sourceSquare);
+  };
+
+  // Handle piece drop for drag and drop movement
+  const onDrop = (sourceSquare: Square, targetSquare: Square, piece: string) => {
+    // Initialize audio if not yet initialized (browsers require user interaction)
+    if (!audioInitialized) {
+      initAudio().then(() => setAudioInitialized(true));
+      return false;
+    }
+
+    // Return if it's not the player's turn or the game is over
+    if (game.turn() !== playerColor || game.isGameOver() || isThinking) return false;
+    
+    // Try to make a move
+    const newGame = new Chess(game.fen());
+    const gamePiece = newGame.get(sourceSquare);
+    
+    const result = makeMove(newGame, sourceSquare, targetSquare);
+    
+    if (result.success) {
+      // Play appropriate sounds
+      if (result.isCapture && result.capturedPiece) {
+        playCapture(`${gamePiece?.color}${gamePiece?.type}`, result.capturedPiece, targetSquare);
+      } else {
+        playPieceSound(`${gamePiece?.color}${gamePiece?.type}`, targetSquare);
+      }
+      
+      // Play special sounds if applicable
+      if (result.isCheckmate) {
+        playSpecialSound('checkmate');
+      } else if (result.isCheck) {
+        playSpecialSound('check');
+      } else if (result.isStalemate) {
+        playSpecialSound('stalemate');
+      } else if (result.isCastling) {
+        playSpecialSound('castling');
+      } else if (result.isEnPassant) {
+        playSpecialSound('enPassant');
+      }
+      
+      // Update game state
+      setGame(newGame);
+      setFen(newGame.fen());
+      setSelectedSquare(null);
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Handle player move with click-to-select
   const onSquareClick = (square: Square) => {
     // Initialize audio if not yet initialized (browsers require user interaction)
     if (!audioInitialized) {
@@ -209,10 +278,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         <Chessboard
           position={fen}
           onSquareClick={onSquareClick}
+          onPieceDragBegin={onPieceDragBegin}
+          onPieceDrop={onDrop}
           customDarkSquareStyle={darkSquareStyle as Record<string, string>}
           customLightSquareStyle={lightSquareStyle as Record<string, string>}
           showBoardNotation={showCoordinates}
           boardWidth={boardWidth}
+          areArrowsAllowed={true}
+          animationDuration={300}
         />
       </div>
       
