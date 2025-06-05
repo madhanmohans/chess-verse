@@ -3,31 +3,35 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Roboto', sans-serif;
-  background-color: #2c2c2c;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   color: #eee;
 }
 
 /* Header styling */
 .App-header {
-  background-color: #1a1a1a;
-  padding: 1.5rem 0;
+  background-color: #111;
+  padding: 2rem 0;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid #ffd700;
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 3rem;
   color: #ffd700;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  font-weight: 700;
 }
 
 .App-header h2 {
   margin: 0.5rem 0 0;
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: 1.3rem;
+  font-weight: 300;
   color: #e0e0e0;
+  letter-spacing: 1px;
 }
 
 /* Main content area */
@@ -46,67 +50,134 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadeIn 0.5s ease-in;
 }
 
 /* Board wrapper */
 .board-wrapper {
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  border: 3px solid #333;
+  background: #222;
+  padding: 4px;
 }
 
 /* Game controls */
 .game-controls {
-  background-color: #333;
-  padding: 1rem;
-  border-radius: 4px;
-  min-width: 400px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  min-width: 450px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #444;
+  margin-top: 2rem;
 }
 
 .game-status {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .game-status p {
   margin: 0.25rem 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #ffd700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.game-status p:last-child {
+  color: #aaa;
+  font-size: 1rem;
+  font-style: italic;
 }
 
 /* Button styling */
 .button-controls button {
-  background-color: #ffd700;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
   border: none;
-  color: #333;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  color: #1a1a1a;
+  padding: 0.875rem 2rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .button-controls button:hover {
-  background-color: #f0c800;
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
 }
 
 .button-controls button:active {
-  transform: translateY(1px);
-  background-color: #e0b800;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 /* Footer styling */
 .App-footer {
-  background-color: #1a1a1a;
-  padding: 1.5rem;
+  background-color: #111;
+  padding: 2rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #b0b0b0;
+  border-top: 1px solid #333;
 }
 
 .App-footer p {
   margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.App-footer p:first-child {
+  font-weight: 500;
+  color: #e0e0e0;
+}
+
+/* Chess board customizations */
+.chess-board-container [data-square] {
+  transition: transform 0.1s ease;
+}
+
+.chess-board-container [data-square]:hover {
+  cursor: pointer;
+}
+
+/* Animation for game start */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading state */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffd700;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Responsive adjustments */
@@ -116,7 +187,32 @@
   }
   
   .game-controls {
-    min-width: 320px;
+    min-width: 340px;
+    padding: 1rem 1.5rem;
+  }
+  
+  .App-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .App-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .button-controls button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .board-wrapper {
+    border-width: 2px;
+    padding: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-controls {
+    min-width: 300px;
   }
   
   .App-header h1 {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import { 
-  playSquareNote, 
   playPieceSound, 
   playCapture, 
   playSpecialSound,
@@ -23,8 +22,8 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   showCoordinates = true,
-  darkSquareStyle = { backgroundColor: '#769656' },
-  lightSquareStyle = { backgroundColor: '#eeeed2' },
+  darkSquareStyle = { backgroundColor: '#000000' },
+  lightSquareStyle = { backgroundColor: '#ffffff' },
   boardWidth = 560
 }) => {
   const [game, setGame] = useState<Chess>(createNewGame());
@@ -34,6 +33,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w');
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [audioInitialized, setAudioInitialized] = useState<boolean>(false);
+  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
 
   // Initialize audio
   useEffect(() => {
@@ -42,7 +43,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       setAudioInitialized(true);
       
       // Play opening sound when game starts
-      playSpecialSound('opening');
+      if (!isMuted) {
+        playSpecialSound('opening');
+      }
     };
     init();
   }, []);
@@ -75,16 +78,15 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         const newGame = new Chess(game.fen());
         const piece = newGame.get(move.from as Square);
         
-        // First play the source square note
-        playSquareNote(move.from as Square);
-        
         // Make the move
         const result = makeMove(newGame, move.from as Square, move.to as Square);
         
-        if (result.success) {
-          // Play the destination sound after a small delay
-          setTimeout(() => {
-            // Play appropriate sounds
+        if (result.success && result.move) {
+          // Add move to history
+          setMoveHistory(prev => [...prev, result.move!.san]);
+          
+          // Play only the destination sound if not muted
+          if (!isMuted) {
             if (result.isCapture && result.capturedPiece) {
               playCapture(`${piece?.color}${piece?.type}`, result.capturedPiece, move.to as Square);
             } else {
@@ -103,7 +105,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
             } else if (result.isEnPassant) {
               playSpecialSound('enPassant');
             }
-          }, 300);
+          }
           
           // Update game state
           setGame(newGame);
@@ -113,7 +115,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       
       setIsThinking(false);
     }, 1000);
-  }, [game]);
+  }, [game, isMuted]);
 
   // Handle computer's turn
   useEffect(() => {
@@ -133,8 +135,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     // Return if it's not the player's turn or the game is over
     if (game.turn() !== playerColor || game.isGameOver() || isThinking) return;
     
-    // Play the note for the source square
-    playSquareNote(sourceSquare);
+    // No sound on drag begin as per requirement
   };
 
   // Handle piece drop for drag and drop movement
@@ -154,25 +155,30 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     
     const result = makeMove(newGame, sourceSquare, targetSquare);
     
-    if (result.success) {
-      // Play appropriate sounds
-      if (result.isCapture && result.capturedPiece) {
-        playCapture(`${gamePiece?.color}${gamePiece?.type}`, result.capturedPiece, targetSquare);
-      } else {
-        playPieceSound(`${gamePiece?.color}${gamePiece?.type}`, targetSquare);
-      }
+    if (result.success && result.move) {
+      // Add move to history
+      setMoveHistory(prev => [...prev, result.move!.san]);
       
-      // Play special sounds if applicable
-      if (result.isCheckmate) {
-        playSpecialSound('checkmate');
-      } else if (result.isCheck) {
-        playSpecialSound('check');
-      } else if (result.isStalemate) {
-        playSpecialSound('stalemate');
-      } else if (result.isCastling) {
-        playSpecialSound('castling');
-      } else if (result.isEnPassant) {
-        playSpecialSound('enPassant');
+      // Play appropriate sounds for the target square only if not muted
+      if (!isMuted) {
+        if (result.isCapture && result.capturedPiece) {
+          playCapture(`${gamePiece?.color}${gamePiece?.type}`, result.capturedPiece, targetSquare);
+        } else {
+          playPieceSound(`${gamePiece?.color}${gamePiece?.type}`, targetSquare);
+        }
+        
+        // Play special sounds if applicable
+        if (result.isCheckmate) {
+          playSpecialSound('checkmate');
+        } else if (result.isCheck) {
+          playSpecialSound('check');
+        } else if (result.isStalemate) {
+          playSpecialSound('stalemate');
+        } else if (result.isCastling) {
+          playSpecialSound('castling');
+        } else if (result.isEnPassant) {
+          playSpecialSound('enPassant');
+        }
       }
       
       // Update game state
@@ -195,8 +201,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     // Return if it's not the player's turn or the game is over
     if (game.turn() !== playerColor || game.isGameOver() || isThinking) return;
     
-    // Play the note for the square
-    playSquareNote(square);
+    // No sound on square selection as per requirement
     
     // If no square is selected, select this one if it has a piece of the right color
     if (!selectedSquare) {
@@ -219,25 +224,30 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     
     const result = makeMove(newGame, selectedSquare, square);
     
-    if (result.success) {
-      // Play appropriate sounds
-      if (result.isCapture && result.capturedPiece) {
-        playCapture(`${piece?.color}${piece?.type}`, result.capturedPiece, square);
-      } else {
-        playPieceSound(`${piece?.color}${piece?.type}`, square);
-      }
+    if (result.success && result.move) {
+      // Add move to history
+      setMoveHistory(prev => [...prev, result.move!.san]);
       
-      // Play special sounds if applicable
-      if (result.isCheckmate) {
-        playSpecialSound('checkmate');
-      } else if (result.isCheck) {
-        playSpecialSound('check');
-      } else if (result.isStalemate) {
-        playSpecialSound('stalemate');
-      } else if (result.isCastling) {
-        playSpecialSound('castling');
-      } else if (result.isEnPassant) {
-        playSpecialSound('enPassant');
+      // Play appropriate sounds for the target square only if not muted
+      if (!isMuted) {
+        if (result.isCapture && result.capturedPiece) {
+          playCapture(`${piece?.color}${piece?.type}`, result.capturedPiece, square);
+        } else {
+          playPieceSound(`${piece?.color}${piece?.type}`, square);
+        }
+        
+        // Play special sounds if applicable
+        if (result.isCheckmate) {
+          playSpecialSound('checkmate');
+        } else if (result.isCheck) {
+          playSpecialSound('check');
+        } else if (result.isStalemate) {
+          playSpecialSound('stalemate');
+        } else if (result.isCastling) {
+          playSpecialSound('castling');
+        } else if (result.isEnPassant) {
+          playSpecialSound('enPassant');
+        }
       }
       
       // Update game state
@@ -261,16 +271,33 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     setGame(newGame);
     setFen(newGame.fen());
     setSelectedSquare(null);
+    setMoveHistory([]);
     setGameStatus(`${newGame.turn() === 'w' ? 'White' : 'Black'} to move.`);
     
-    // Play opening sound
-    playSpecialSound('opening');
+    // Play opening sound if not muted
+    if (!isMuted) {
+      playSpecialSound('opening');
+    }
   };
 
   // Switch sides
   const switchSides = () => {
     setPlayerColor(prev => prev === 'w' ? 'b' : 'w');
   };
+
+  // Toggle mute
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
+  };
+
+  // Custom square styles for selected pieces
+  const customSquareStyles: Record<string, React.CSSProperties> = {};
+  if (selectedSquare) {
+    customSquareStyles[selectedSquare] = {
+      backgroundColor: 'rgba(255, 215, 0, 0.5)',
+      boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.8)'
+    };
+  }
 
   return (
     <div className="chess-board-container">
@@ -280,8 +307,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
           onSquareClick={onSquareClick}
           onPieceDragBegin={onPieceDragBegin}
           onPieceDrop={onDrop}
-          customDarkSquareStyle={darkSquareStyle as Record<string, string>}
-          customLightSquareStyle={lightSquareStyle as Record<string, string>}
+          customDarkSquareStyle={{backgroundColor: '#000000'}}
+          customLightSquareStyle={{backgroundColor: '#ffffff'}}
+          customSquareStyles={customSquareStyles}
+          boardOrientation={playerColor === 'w' ? 'white' : 'black'}
           showBoardNotation={showCoordinates}
           boardWidth={boardWidth}
           areArrowsAllowed={true}
@@ -292,13 +321,29 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       <div className="game-controls" style={{ marginTop: '20px' }}>
         <div className="game-status">
           <p>{gameStatus}</p>
-          {isThinking && <p>Computer is thinking...</p>}
+          {isThinking && <p><span className="loading"></span> Computer is thinking...</p>}
         </div>
         
         <div className="button-controls" style={{ marginTop: '10px' }}>
           <button onClick={resetGame} style={{ marginRight: '10px' }}>New Game</button>
-          <button onClick={switchSides}>Switch Sides</button>
+          <button onClick={switchSides} style={{ marginRight: '10px' }}>Switch Sides</button>
+          <button onClick={toggleMute}>{isMuted ? '🔇 Unmute' : '🔊 Mute'}</button>
         </div>
+        
+        {moveHistory.length > 0 && (
+          <div className="move-history" style={{ 
+            marginTop: '1rem', 
+            padding: '0.5rem', 
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '4px',
+            maxHeight: '100px',
+            overflowY: 'auto'
+          }}>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#aaa' }}>
+              Moves: {moveHistory.join(' ')}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
