@@ -1,37 +1,70 @@
+/* Import Kalam font for hand-drawn feel */
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Caveat:wght@400;600;700&display=swap');
+
 /* Main App styling */
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  color: #eee;
+  font-family: 'Kalam', cursive;
+  background: #f9f8f5;
+  background-image: 
+    repeating-linear-gradient(
+      to right,
+      transparent,
+      transparent 19px,
+      rgba(0, 0, 0, 0.03) 19px,
+      rgba(0, 0, 0, 0.03) 20px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 19px,
+      rgba(0, 0, 0, 0.03) 19px,
+      rgba(0, 0, 0, 0.03) 20px
+    );
+  color: #2a2a2a;
 }
 
 /* Header styling */
 .App-header {
-  background-color: #111;
+  background-color: transparent;
   padding: 2rem 0;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border-bottom: 2px solid #ffd700;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.App-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: #2a2a2a;
+  border-radius: 50%;
+  transform: scaleY(0.5) rotate(-0.5deg);
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 3rem;
-  color: #ffd700;
-  letter-spacing: 3px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  font-size: 3.5rem;
+  color: #2a2a2a;
+  font-family: 'Caveat', cursive;
   font-weight: 700;
+  letter-spacing: 2px;
+  transform: rotate(-1deg);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
 .App-header h2 {
   margin: 0.5rem 0 0;
-  font-size: 1.3rem;
-  font-weight: 300;
-  color: #e0e0e0;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #4a4a4a;
   letter-spacing: 1px;
+  transform: rotate(0.5deg);
 }
 
 /* Main content area */
@@ -55,98 +88,161 @@
 
 /* Board wrapper */
 .board-wrapper {
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-  border: 3px solid #333;
-  background: #222;
-  padding: 4px;
+  box-shadow: 
+    4px 4px 8px rgba(0, 0, 0, 0.2),
+    -2px -2px 4px rgba(0, 0, 0, 0.1);
+  border: 3px solid #2a2a2a;
+  background: #2a2a2a;
+  padding: 3px;
+  transform: rotate(0.2deg);
+}
+
+/* Make SVG pieces look more sketch-like */
+.chess-board-container svg {
+  filter: 
+    drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.2))
+    drop-shadow(-1px -1px 0px rgba(255, 255, 255, 0.3));
+}
+
+.chess-board-container svg.dragging {
+  filter: 
+    drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3))
+    drop-shadow(-1px -1px 0px rgba(255, 255, 255, 0.4));
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Custom piece container styles */
+.chess-board-container [data-piece] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.chess-board-container [data-piece] svg {
+  width: 85% !important;
+  height: 85% !important;
+  display: block !important;
 }
 
 /* Game controls */
 .game-controls {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  background: rgba(255, 255, 255, 0.7);
   padding: 1.5rem 2rem;
   border-radius: 8px;
   min-width: 450px;
   text-align: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  border: 1px solid #444;
+  box-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.1),
+    -1px -1px 2px rgba(255, 255, 255, 0.9);
+  border: 2px solid #2a2a2a;
   margin-top: 2rem;
+  transform: rotate(-0.3deg);
+  position: relative;
+}
+
+.game-controls::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: inherit;
+  border: inherit;
+  border-radius: inherit;
+  z-index: -1;
+  transform: rotate(0.5deg);
+  opacity: 0.5;
 }
 
 .game-status {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px dashed #2a2a2a;
 }
 
 .game-status p {
   margin: 0.25rem 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #ffd700;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2a2a2a;
+  font-family: 'Caveat', cursive;
 }
 
 .game-status p:last-child {
-  color: #aaa;
+  color: #666;
   font-size: 1rem;
   font-style: italic;
+  font-weight: 400;
 }
 
 /* Button styling */
 .button-controls button {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  border: none;
-  color: #1a1a1a;
-  padding: 0.875rem 2rem;
+  background: #ffd700;
+  border: 3px solid #2a2a2a;
+  color: #2a2a2a;
+  padding: 0.75rem 1.5rem;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: 'Kalam', cursive;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  box-shadow: 
+    3px 3px 0px #2a2a2a,
+    inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+  transform: rotate(-1deg);
+  position: relative;
 }
 
 .button-controls button:hover {
-  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+  transform: rotate(1deg) translateY(-2px);
+  box-shadow: 
+    5px 5px 0px #2a2a2a,
+    inset -1px -1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .button-controls button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  transform: rotate(0deg) translateY(0);
+  box-shadow: 
+    1px 1px 0px #2a2a2a,
+    inset 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Footer styling */
 .App-footer {
-  background-color: #111;
+  background-color: transparent;
   padding: 2rem;
   text-align: center;
-  font-size: 0.95rem;
-  color: #b0b0b0;
-  border-top: 1px solid #333;
+  font-size: 1rem;
+  color: #4a4a4a;
+  border-top: 3px solid #2a2a2a;
+  margin-top: 2rem;
+  position: relative;
 }
 
 .App-footer p {
   margin: 0.5rem 0;
   line-height: 1.6;
+  font-family: 'Kalam', cursive;
 }
 
 .App-footer p:first-child {
-  font-weight: 500;
-  color: #e0e0e0;
+  font-weight: 700;
+  color: #2a2a2a;
+  font-size: 1.1rem;
 }
 
 /* Chess board customizations */
 .chess-board-container [data-square] {
   transition: transform 0.1s ease;
+  position: relative;
 }
 
 .chess-board-container [data-square]:hover {
@@ -157,11 +253,11 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px) rotate(-2deg);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) rotate(0.2deg);
   }
 }
 
@@ -170,7 +266,7 @@
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid #ffd700;
+  border: 3px solid #2a2a2a;
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 1s ease-in-out infinite;
@@ -178,6 +274,12 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Move history styling */
+.move-history {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem !important;
 }
 
 /* Responsive adjustments */
@@ -196,11 +298,11 @@
   }
   
   .App-header h2 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
   
   .button-controls button {
-    padding: 0.75rem 1.5rem;
+    padding: 0.6rem 1.2rem;
     font-size: 1rem;
   }
   

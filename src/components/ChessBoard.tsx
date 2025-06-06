@@ -12,6 +12,7 @@ import {
   makeMove,
   getComputerMove
 } from '../utils/chessUtils';
+import { customPieces } from './CustomPieces';
 
 interface ChessBoardProps {
   showCoordinates?: boolean;
@@ -22,8 +23,26 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   showCoordinates = true,
-  darkSquareStyle = { backgroundColor: '#000000' },
-  lightSquareStyle = { backgroundColor: '#ffffff' },
+  darkSquareStyle = { 
+    backgroundColor: '#2a2a2a',
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    )`
+  },
+  lightSquareStyle = { 
+    backgroundColor: '#f5f5dc',
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.02) 2px,
+      rgba(0, 0, 0, 0.02) 4px
+    )`
+  },
   boardWidth = 560
 }) => {
   const [game, setGame] = useState<Chess>(createNewGame());
@@ -294,22 +313,28 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   const customSquareStyles: Record<string, React.CSSProperties> = {};
   if (selectedSquare) {
     customSquareStyles[selectedSquare] = {
-      backgroundColor: 'rgba(255, 215, 0, 0.5)',
-      boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.8)'
+      backgroundColor: 'rgba(255, 215, 0, 0.3)',
+      boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.5)',
+      border: '3px solid #ffd700',
+      borderRadius: '2px'
     };
   }
 
   return (
     <div className="chess-board-container">
-      <div className="board-wrapper" style={{ width: boardWidth }}>
+      <div className="board-wrapper" style={{ 
+        width: boardWidth,
+        filter: 'drop-shadow(0 0 1px rgba(0, 0, 0, 0.3))'
+      }}>
         <Chessboard
           position={fen}
           onSquareClick={onSquareClick}
           onPieceDragBegin={onPieceDragBegin}
           onPieceDrop={onDrop}
-          customDarkSquareStyle={{backgroundColor: '#000000'}}
-          customLightSquareStyle={{backgroundColor: '#ffffff'}}
+          customDarkSquareStyle={darkSquareStyle}
+          customLightSquareStyle={lightSquareStyle}
           customSquareStyles={customSquareStyles}
+          customPieces={customPieces}
           boardOrientation={playerColor === 'w' ? 'white' : 'black'}
           showBoardNotation={showCoordinates}
           boardWidth={boardWidth}
@@ -337,7 +362,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
             backgroundColor: 'rgba(255, 255, 255, 0.05)',
             borderRadius: '4px',
             maxHeight: '100px',
-            overflowY: 'auto'
+            overflowY: 'auto',
+            border: '1px dashed rgba(255, 255, 255, 0.2)'
           }}>
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#aaa' }}>
               Moves: {moveHistory.join(' ')}
