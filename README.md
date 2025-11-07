@@ -1,46 +1,108 @@
-# Getting Started with Create React App
+# Chess Verse: Where Chess Meets Music
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Chess Verse is an interactive web application that integrates chess gameplay with musical elements. Each chess square corresponds to a musical note, and each piece plays with a different instrument based on its traditional role in warfare.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Musical Chess Board**: Each square on the chess board corresponds to a specific musical note
+- **Unique Instrument Per Piece**:
+  - **Pawns (Infantry)**: Simple triangle synth
+  - **Knights (Cavalry)**: FM synth with complex harmonics
+  - **Bishops (Archers)**: AM synth with shimmering textures
+  - **Rooks (Siege weapons)**: Deep membrane synth
+  - **Queen (Commander)**: Rich polyphonic synth
+  - **King (Monarch)**: Regal, bell-like metal synth
+- **Special Sound Effects** for chess events:
+  - Opening game fanfare
+  - Check alert
+  - Checkmate victory theme
+  - Castling sequence
+  - En passant flourish
+  - Stalemate pattern
+  - Piece captures (exposition of both pieces' sounds)
+- **400 ELO Computer Opponent**
+- **Responsive Design**
+- **Classic Black and White Board**
 
-### `npm start`
+## Musical Mapping
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The chess board is mapped to musical notes as follows:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Files (columns) map directly to musical notes: a = C, b = D, c = E, d = F, e = G, f = A, g = B, h = C (octave higher)
+- Ranks (rows) map to octaves: 1 = 1st octave, 2 = 2nd octave, and so on
+- Example: The square c4 plays the note E4
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
 
-### `npm run build`
+- Node.js (v14 or later)
+- npm or yarn
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Clone the repository:
+```
+git clone https://github.com/yourusername/chess-verse.git
+cd chess-verse
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Install dependencies:
+```
+npm install
+```
 
-### `npm run eject`
+3. Start the development server:
+```
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to play.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## How to Play
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. **Start a Game**: The game begins with you playing as White by default.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+2. **Make a Move**: You can move pieces in two ways:
+   - **Drag and Drop**: Click and hold a piece, then drag it to the destination square
+   - **Click to Move**: Click on a piece to select it, then click on a valid destination square
+   
+3. **Musical Feedback**:
+   - When you complete a move, you'll hear the sound of the destination square with the piece's instrument
+   - Special chess events trigger unique musical phrases
 
-## Learn More
+4. **Computer Response**: The computer will automatically make a move after you, playing at approximately 400 ELO strength.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+5. **Game Controls**: Use the buttons below the board to:
+   - Start a new game
+   - Switch to playing as Black
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Audio Behavior
+
+- **Target Square Sound**: When you complete a move, the app plays the piece's instrument at the destination square's note
+- **Capturing a Piece**: First plays the captured piece's sound, then the capturing piece's sound
+- **Special Moves**: Each special chess event (castling, en passant, etc.) has a dramatic musical signature
+
+## Interaction Hints
+
+- **Drag and Drop**: Grasp a piece firmly and drag to the desired square - release to complete the move
+- **Click to Move**: Click once on your piece, then click on your target square
+- **Invalid Moves**: The piece will return to its original position if a move is invalid
+- **Check Situations**: When in check, only moves that get you out of check are allowed
+
+## Troubleshooting
+
+- **No Sound?** Browsers require user interaction before allowing audio. Click any square to initialize the audio system.
+- **Performance Issues?** If you experience lag, try using a more powerful device or a different browser.
+
+## Technology Stack
+
+- React
+- TypeScript
+- chess.js for chess logic
+- Tone.js for audio generation
+- react-chessboard for the visual interface
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
