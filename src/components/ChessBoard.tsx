@@ -12,36 +12,21 @@ import {
   makeMove,
   getComputerMove
 } from '../utils/chessUtils';
-import { customPieces } from './CustomPieces';
 
 interface ChessBoardProps {
   showCoordinates?: boolean;
-  darkSquareStyle?: React.CSSProperties;
-  lightSquareStyle?: React.CSSProperties;
+  darkSquareStyle?: Record<string, string>;
+  lightSquareStyle?: Record<string, string>;
   boardWidth?: number;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   showCoordinates = true,
   darkSquareStyle = { 
-    backgroundColor: '#2a2a2a',
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.02) 2px,
-      rgba(255, 255, 255, 0.02) 4px
-    )`
+    backgroundColor: '#2a2a2a'
   },
   lightSquareStyle = { 
-    backgroundColor: '#f5f5dc',
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.02) 2px,
-      rgba(0, 0, 0, 0.02) 4px
-    )`
+    backgroundColor: '#f5f5dc'
   },
   boardWidth = 560
 }) => {
@@ -67,6 +52,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       }
     };
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update game status messages
@@ -334,7 +320,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
           customDarkSquareStyle={darkSquareStyle}
           customLightSquareStyle={lightSquareStyle}
           customSquareStyles={customSquareStyles}
-          customPieces={customPieces}
           boardOrientation={playerColor === 'w' ? 'white' : 'black'}
           showBoardNotation={showCoordinates}
           boardWidth={boardWidth}
@@ -352,7 +337,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         <div className="button-controls" style={{ marginTop: '10px' }}>
           <button onClick={resetGame} style={{ marginRight: '10px' }}>New Game</button>
           <button onClick={switchSides} style={{ marginRight: '10px' }}>Switch Sides</button>
-          <button onClick={toggleMute}>{isMuted ? '🔇 Unmute' : '🔊 Mute'}</button>
+          <button onClick={toggleMute}>{isMuted ? '?? Unmute' : '?? Mute'}</button>
         </div>
         
         {moveHistory.length > 0 && (

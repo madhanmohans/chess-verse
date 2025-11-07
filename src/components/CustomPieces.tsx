@@ -340,8 +340,8 @@ export const bP = ({ isDragging }: PieceProps) => (
   </svg>
 );
 
-// Export all pieces as a map
-export const customPieces = {
+// Export all pieces as a map with proper typing
+export const customPieces: Record<string, React.FC<PieceProps>> = {
   wK, wQ, wB, wN, wR, wP,
   bK, bQ, bB, bN, bR, bP
 }; 
